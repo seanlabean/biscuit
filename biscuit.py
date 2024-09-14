@@ -8,14 +8,13 @@
 #
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QPushButton, QLabel, QTextBrowser, QAction, QFileDialog, QMessageBox, QComboBox
 from PyQt5.QtGui import QPixmap, QIcon
+
 import openai
+from bs4 import BeautifulSoup
+import yaml
 
 import requests
 from time import time
-
-from bs4 import BeautifulSoup
-
-import yaml
 
 class Browser(QMainWindow):
     def __init__(self):
