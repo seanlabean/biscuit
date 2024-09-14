@@ -37,7 +37,7 @@ class Browser(QMainWindow):
         self.aiprompts.addItem('Summarize')
         self.aiprompts.addItem('Poetify')
         self.aiprompts.addItem('Roast')
-        self.aiprompts.addItem('Similar Links')
+        self.aiprompts.addItem('Praise')
         self.prompt_button = QPushButton("AI that shit")
 
         self.layout.addWidget(self.go_button)
@@ -137,24 +137,26 @@ class Browser(QMainWindow):
                 openai_project_key = config["openai-proj"]
             except yaml.YAMLError as exc:
                 print(exc)
+
+        html_text = self.page_display.toPlainText()
+        prompt = f"Embody the skills of the most skilled poets througout history and condense the following into a simple yet powerful poem: {html_text[:2000]}"  # Limiting to 2000 characters
+        task = self.aiprompts.currentText()
+
         client = openai.OpenAI(
             organization=openai_organization_key,
             project=openai_project_key
         )
-        html_text = self.page_display.toPlainText()
-
-        prompt = f"Embody the skills of the most skilled poets througout history and condense the following into a simple yet powerful poem: {html_text[:2000]}"  # Limiting to 2000 characters
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a masterful poet and assistant."},
+                {"role": "system", "content": "You are helpful assistant."},
                 {
                     "role": "user",
-                    "content": f"Write a short but powerful poem based on the following text: {prompt}"
+                    "content": f"{task} the following webpage in a short, bite-sized response. Format your response with HTML elements for headers and paragraphs, do not include any Markdown styling. Here is the webpage to {task}: {prompt}"
                 }
             ]
         )
-        self.page_display.setPlainText(completion.choices[0].message.content.strip())
+        self.page_display.setHtml(completion.choices[0].message.content.strip())
 
 
     def save_page(self):
