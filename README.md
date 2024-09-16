@@ -10,7 +10,9 @@ It relies on the PyQt5, BeautifulSoup, and openai libraries.
 
 Type in a url of your choice (you may omit http(s)://) click Go and start your browsing adventure! Resize the window as needed.
 
-At any point you may save the HTML content of the current page to a local file by using the menu bar at the top of the window. There you may also toggle the theme from dark to light and back.
+You may "AI-ify" the content displayed in the Biscuit window at any time by selecting the AI task from the dropdown menu (Summarize, Poetify, Roast, Praise) and clicking the "AI that shit" button. The contents of the Biscuit window will be replaced with the AI output. You may chain AI tasks (e.g. Roast the Poem of the Summary of a webpage). This functionality is dependent on an active OpenAI organization and project, the API keys to which you must include in `config.yaml`.
+
+At any point you may save the Biscuit window content as a `.html` to local storage using the menu bar at the top of the window. There you may also toggle the theme from dark to light and back.
 
 ## Inspiration
 
