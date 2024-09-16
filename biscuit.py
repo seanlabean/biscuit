@@ -18,6 +18,9 @@ from time import time
 
 class Browser(QMainWindow):
     def __init__(self):
+        """
+        Build the app window, functionality, and welcome message.
+        """
         super().__init__()
         self.setWindowTitle("BISCUIT")
 
@@ -32,13 +35,13 @@ class Browser(QMainWindow):
         self.layout.addWidget(self.url_bar)
 
         # Go button and actions
-        self.go_button = QPushButton("Go")
+        self.go_button = QPushButton("Go To URL")
         self.aiprompts = QComboBox()
         self.aiprompts.addItem('Summarize')
         self.aiprompts.addItem('Poetify')
         self.aiprompts.addItem('Roast')
         self.aiprompts.addItem('Praise')
-        self.prompt_button = QPushButton("AI that shit")
+        self.prompt_button = QPushButton("AI Shenanigans")
 
         self.layout.addWidget(self.go_button)
         self.go_button.clicked.connect(self.load_page)
@@ -101,7 +104,7 @@ class Browser(QMainWindow):
         soup = BeautifulSoup(response.content, "html.parser")
         # Remove <figure> and <img> tags
         for tag in soup(["figure", "img"]):
-            tag.decompose()  # This will remove the tag from the HTML
+            tag.decompose()
 
         self.page_display.setHtml(soup.prettify())
         parsed_length = len(soup.prettify())
@@ -115,6 +118,10 @@ class Browser(QMainWindow):
         self.url_bar.setText(url)
 
     def handle_clicked_link(self, url):
+        """
+        When a link is clicked, format it to be loaded, and call load_page()
+        on the result.
+        """
         current_url_text = self.url_bar.text()
         inc_url_text = url.toString()
         if "https" in inc_url_text or "http" in inc_url_text:
@@ -130,6 +137,9 @@ class Browser(QMainWindow):
 
     # Function to send parsed HTML to ChatGPT and get a summary
     def prompt_html(self):
+        """
+        Using OpenAI credientials, 
+        """
         with open("config.yaml") as stream:
             try:
                 config = yaml.safe_load(stream)
@@ -139,7 +149,7 @@ class Browser(QMainWindow):
                 print(exc)
 
         html_text = self.page_display.toPlainText()
-        prompt = f"Embody the skills of the most skilled poets througout history and condense the following into a simple yet powerful poem: {html_text[:2000]}"  # Limiting to 2000 characters
+        prompt = f"{html_text[:2000]}"  # Limiting to 2000 characters
         task = self.aiprompts.currentText()
 
         client = openai.OpenAI(
@@ -152,7 +162,7 @@ class Browser(QMainWindow):
                 {"role": "system", "content": "You are helpful assistant."},
                 {
                     "role": "user",
-                    "content": f"{task} the following webpage in a short, bite-sized response. Format your response with HTML elements for headers and paragraphs, do not include any Markdown styling. Here is the webpage to {task}: {prompt}"
+                    "content": f"{task} the following webpage in a short, bite-sized response. Format your response with HTML elements for headers and paragraphs, do not include any Markdown styling. Ignore any header, footer, and nav elements. Here is the webpage to {task}: {prompt}"
                 }
             ]
         )
@@ -160,6 +170,10 @@ class Browser(QMainWindow):
 
 
     def save_page(self):
+        """
+        Open a save dialog to prompt user to save window contents as an
+        HTML local file.
+        """
         filename, _ = QFileDialog.getSaveFileName(self, "Save Page As", "", "HTML Files (*.html);;All Files (*)")
         if filename:
             try:
@@ -170,6 +184,9 @@ class Browser(QMainWindow):
                 QMessageBox.critical(self, "Error", f"Could not save page: {str(e)}")
     
     def change_theme(self):
+        """
+        Swap out the current stylesheet with the other option.
+        """
         current_theme = self.central_widget.styleSheet()
         if current_theme:
             theme_out = ""
