@@ -6,8 +6,11 @@
 # Any and all of this code may be used by anyone for any purpose.
 # I prefer if you give credit if you believe it is due :)
 #
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QPushButton, QLabel, QTextBrowser, QAction, QFileDialog, QMessageBox, QComboBox
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
+                             QWidget, QLineEdit, QPushButton, QLabel, 
+                             QTextBrowser, QAction, QFileDialog, 
+                             QMessageBox, QComboBox)
+from PyQt5.QtGui import QIcon
 
 import openai
 from bs4 import BeautifulSoup
@@ -55,7 +58,12 @@ class Browser(QMainWindow):
         self.page_display.setOpenExternalLinks(False)
         self.page_display.anchorClicked.connect(self.handle_clicked_link)
         self.layout.addWidget(self.page_display)
-        self.welcome_page = """<html><head></head><body><p>Welcome to <code>BISCUIT</code> ;)</p><p>You are now using a free and open source tool. Feel free to contribute to or repurpose.</p><p>You may save the HTML content of any page you visit via the menu bar.</p><p>Happy Browsing!</p><p>Written by S. C. Lewis</p></body></html>"""
+        self.welcome_page = """
+        <html><head></head><body><p>Welcome to <code>BISCUIT</code> ;)</p>
+        <p>You are now using a free and open source tool. Feel free to contribute to or repurpose.</p>
+        <p>You may save the HTML content of any page you visit via the menu bar.</p>
+        <p>Happy Browsing!</p><p>Written by S. C. Lewis</p></body></html>
+        """
         self.page_display.setHtml(self.welcome_page)
 
         # Data info label
@@ -135,10 +143,10 @@ class Browser(QMainWindow):
         self.url_bar.setText(url_str)
         self.load_page()
 
-    # Function to send parsed HTML to ChatGPT and get a summary
     def prompt_html(self):
         """
-        Using OpenAI credientials, 
+        Using OpenAI credientials query ChatGPT with an engineered prompt.
+        Format and display the response. 
         """
         with open("config.yaml") as stream:
             try:
@@ -162,12 +170,14 @@ class Browser(QMainWindow):
                 {"role": "system", "content": "You are helpful assistant."},
                 {
                     "role": "user",
-                    "content": f"{task} the following webpage in a short, bite-sized response. Format your response with HTML elements for headers and paragraphs, do not include any Markdown styling. Ignore any header, footer, and nav elements. Here is the webpage to {task}: {prompt}"
+                    "content": f"{task} the following webpage in a short, bite-sized response. \
+                            Format your response with HTML elements for headers and paragraphs, do not include any \
+                            Markdown styling. Ignore any header, footer, and nav elements. \
+                            Here is the webpage to {task}: {prompt}"
                 }
             ]
         )
         self.page_display.setHtml(completion.choices[0].message.content.strip())
-
 
     def save_page(self):
         """
@@ -204,8 +214,9 @@ class Browser(QMainWindow):
         self.page_display.setStyleSheet(theme_out)
         self.info_label.setStyleSheet(theme_out)
 
-app = QApplication([])
-window = Browser()
-window.show()
-app.setWindowIcon(QIcon("biscuit.png"))
-app.exec_()
+if __name__ == "__main__":
+    app = QApplication([])
+    window = Browser()
+    window.show()
+    app.setWindowIcon(QIcon("biscuit.png"))
+    app.exec_()
