@@ -115,12 +115,9 @@ class Browser(QMainWindow):
             tag.decompose()
 
         self.page_display.setHtml(soup.prettify())
-        parsed_length = len(soup.prettify())
         tick = time()
 
-        self.info_label.setText(f"Total Data Received: {total_size} bytes\n"
-        f"HTML Content Size: {content_length} bytes\n"
-        f"Header Size: {headers_size} bytes\n"
+        self.info_label.setText(f"HTML Content Size: {content_length} bytes\n"
         f"Loaded In: {tick-tock:.2f} seconds")
 
         self.url_bar.setText(url)
@@ -160,10 +157,15 @@ class Browser(QMainWindow):
         prompt = f"{html_text[:2000]}"  # Limiting to 2000 characters
         task = self.aiprompts.currentText()
 
-        client = openai.OpenAI(
-            organization=openai_organization_key,
-            project=openai_project_key
-        )
+        try:
+            client = openai.OpenAI(
+                organization=openai_organization_key,
+                project=openai_project_key
+            )
+        except openai.OpenAIError as e:
+            current_url_text = self.url_bar.text()
+            self.page_display.setHtml(f"<p>OpenAI failed to connect. Did you put your OpenAI keys in <code>config.yaml</code></p><p><a href={current_url_text}>Click to go back.</a></p>")
+            return
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
