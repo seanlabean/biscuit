@@ -104,10 +104,13 @@ class Browser(QMainWindow):
         if not url.startswith("http"):
             url = "https://" + url
         tock = time()
-        response = requests.get(url)
-        content_length = len(response.content)
-        headers_size = sum(len(key) + len(value) for key, value in response.headers.items())
-        total_size = content_length + headers_size
+        try:
+            response = requests.get(url)
+        except:
+            fail_text = f"<p>{url} did not respond.</p><br><p>A typo, perhaps?</p>"
+            self.handle_failure(fail_text)
+            return
+        content_length = len(response.content)/1000
 
         soup = BeautifulSoup(response.content, "html.parser")
         # Remove <figure> and <img> tags
@@ -117,8 +120,7 @@ class Browser(QMainWindow):
         self.page_display.setHtml(soup.prettify())
         tick = time()
 
-        self.info_label.setText(f"HTML Content Size: {content_length} bytes\n"
-        f"Loaded In: {tick-tock:.2f} seconds")
+        self.info_label.setText(f"Loaded {content_length:.2f} kB in {tick-tock:.2f} s")
 
         self.url_bar.setText(url)
 
@@ -157,6 +159,7 @@ class Browser(QMainWindow):
         prompt = f"{html_text[:2000]}"  # Limiting to 2000 characters
         task = self.aiprompts.currentText()
 
+        tock = time()
         try:
             client = openai.OpenAI(
                 organization=openai_organization_key,
@@ -164,7 +167,8 @@ class Browser(QMainWindow):
             )
         except openai.OpenAIError as e:
             current_url_text = self.url_bar.text()
-            self.page_display.setHtml(f"<p>OpenAI failed to connect. Did you put your OpenAI keys in <code>config.yaml</code>?</p><p><a href={current_url_text}>Click to go back.</a></p>")
+            fail_text = f"<p>OpenAI failed to connect. Did you put your OpenAI keys in <code>config.yaml</code>?</p><p><a href={current_url_text}>Click to go back.</a></p>"
+            self.handle_failure(fail_text)
             return
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -179,7 +183,14 @@ class Browser(QMainWindow):
                 }
             ]
         )
-        self.page_display.setHtml(completion.choices[0].message.content.strip())
+        tick=time()
+        self.page_display.setHtml(f"<p><a href={current_url_text}>Click to go back.</a></p>" + completion.choices[0].message.content.strip())
+        self.info_label.setText(f"{task}: generated in {tick-tock:.2f} s")
+
+    def handle_failure(self, text):
+        self.page_display.setHtml(text)
+        self.info_label.setText(f"Content failed to load.")
+        return
 
     def save_page(self):
         """
