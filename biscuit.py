@@ -164,7 +164,7 @@ class Browser(QMainWindow):
             )
         except openai.OpenAIError as e:
             current_url_text = self.url_bar.text()
-            self.page_display.setHtml(f"<p>OpenAI failed to connect. Did you put your OpenAI keys in <code>config.yaml</code></p><p><a href={current_url_text}>Click to go back.</a></p>")
+            self.page_display.setHtml(f"<p>OpenAI failed to connect. Did you put your OpenAI keys in <code>config.yaml</code>?</p><p><a href={current_url_text}>Click to go back.</a></p>")
             return
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
