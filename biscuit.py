@@ -155,6 +155,7 @@ class Browser(QMainWindow):
             except yaml.YAMLError as exc:
                 print(exc)
 
+        current_url_text = self.url_bar.text()
         html_text = self.page_display.toPlainText()
         prompt = f"{html_text[:2000]}"  # Limiting to 2000 characters
         task = self.aiprompts.currentText()
@@ -166,8 +167,7 @@ class Browser(QMainWindow):
                 project=openai_project_key
             )
         except openai.OpenAIError as e:
-            current_url_text = self.url_bar.text()
-            fail_text = f"<p>OpenAI failed to connect. Did you put your OpenAI keys in <code>config.yaml</code>?</p><p><a href={current_url_text}>Click to go back.</a></p>"
+            fail_text = f"<p>OpenAI failed to connect. Did you put your OpenAI keys in <code>config.yaml</code>? How about setting the OPENAI_API_KEY env var?</p><p><a href={current_url_text}>Click to go back.</a></p>"
             self.handle_failure(fail_text)
             return
         completion = client.chat.completions.create(
