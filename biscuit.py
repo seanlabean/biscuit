@@ -18,6 +18,8 @@ import yaml
 
 import requests
 from time import time
+import os
+os.environ["XDG_SESSION_TYPE"] = "xcb"
 
 class Browser(QMainWindow):
     def __init__(self):
